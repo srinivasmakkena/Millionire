@@ -1,0 +1,161 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+
+<style>
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .question {
+        margin-bottom: 20px;
+    }
+
+    .options {
+        margin-bottom: 20px;
+    }
+
+    .option {
+        margin-bottom: 10px;
+    }
+
+    .money-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 24px;
+        font-weight: bold;
+        color: #fff; /* Update the text color to white */
+        text-align: center;
+        z-index: 1;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9); /* Add a text shadow for better readability */
+        animation: glowing-text 2s ease-in-out infinite;
+    }
+   
+  @keyframes glowing-text {
+    0% {
+      text-shadow: 0 0 5px #000000;
+    }
+    50% {
+        text-shadow: 0 0 20px #000000;
+    }
+    100% {
+        text-shadow: 0 0 5px #000000;
+    }
+  }
+  .col-md-4 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border
+  }
+  
+  .loading-bar-border{
+    width: 101px; /* adjust the width of the loading bar */
+    height: 100px; /* adjust the height of the loading bar */
+    position: relative;
+    border: 1px solid black; /* add border properties */
+  }
+
+  .loading-bar {
+    width: 100px; /* adjust the width of the loading bar */
+    height: 70px; /* adjust the height of the loading bar */
+    position: absolute;
+    bottom: 0; /* position the loading bar at the bottom */
+    left: 0; 
+    animation: loading 1.5s linear;
+    background: linear-gradient(to top, orange, green); /* adjust the gradient colors */
+    border: 1px solid black; /* add border properties */
+    transform-origin: bottom; 
+   }
+  
+  @keyframes loading {
+    0% {
+      transform: scaleY(0);
+    }
+    50% {
+      transform: scaleY(0.5);
+      box-shadow: 0 0 20px 4px orange;
+    }
+    100% {
+      transform: scaleY(0.8);
+      box-shadow: 0 0 10px 2px orange;
+    }
+  }
+  .options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+} 
+  .option button {
+    background-color: #3498db;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s, border 0.3s;
+}
+
+.option button:hover {
+    background-color: #2079b0;
+    transform: scale(1.1);
+}
+
+</style>
+
+<script>
+  function submitAnswer(option) {
+    // You can perform any necessary actions here when a button is clicked
+    console.log('Selected option:', option);
+    // Add your code to submit the answer to the server or handle it accordingly
+} 
+      function setMoneyLevel(meter, money) {
+        const meterHeight = (money / 100) * 100; // Adjust based on the maximum money value
+        document.getElementsByClassName("money-text").innerHTML =  money;
+        meter.style.height = `${meterHeight}%`;
+    }
+</script>
+
+<div class="container">
+    <div class="row">
+      <div class="col-md-8">
+        <div class="question">
+            <h2>Question: 1</h2>
+            <b><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit?</p></b>
+        </div>
+       
+<div class="options">
+  <div class="option">
+      <button onclick="submitAnswer('Option 1')">Option dhgfkljkbvhftdukhiljknbdvscdtf 1</button>
+  </div>
+  <div class="option">
+      <button onclick="submitAnswer('Option 2')">Option 2</button>
+  </div>
+  <div class="option">
+      <button onclick="submitAnswer('Option 3')">Option 3</button>
+  </div>
+  <div class="option">
+      <button onclick="submitAnswer('Option 4')">Option 4</button>
+  </div>
+</div>
+    </div>
+      <div class="col-md-4">
+   
+            <div class="loading-bar-container" style="margin-top:50px;">
+              <div class="loading-bar-border">
+                <div class="loading-bar"></div>
+                <div class="money-text">$100</div>
+              </div>
+            </div>
+            
+          </div>  
+       
+    </div>
+</div>
+
+{% endblock %}

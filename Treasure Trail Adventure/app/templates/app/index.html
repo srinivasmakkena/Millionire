@@ -1,0 +1,275 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+
+<style>
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .question {
+        margin-bottom: 20px;
+    }
+
+    .options {
+        margin-bottom: 20px;
+    }
+
+    .option {
+        margin-bottom: 10px;
+    }
+
+    .money-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 24px;
+        font-weight: bold;
+        color: #fff; /* Update the text color to white */
+        text-align: center;
+        z-index: 1;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9); /* Add a text shadow for better readability */
+        animation: glowing-text 2s ease-in-out infinite;
+    }
+   
+  @keyframes glowing-text {
+    0% {
+      text-shadow: 0 0 5px #000000;
+    }
+    50% {
+        text-shadow: 0 0 20px #000000;
+    }
+    100% {
+        text-shadow: 0 0 5px #000000;
+    }
+  }
+  .col-md-4 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border
+  }
+  
+  .loading-bar-border{
+    width: 101px; /* adjust the width of the loading bar */
+    height: 100px; /* adjust the height of the loading bar */
+    position: relative;
+    border: 1px solid black; /* add border properties */
+  }
+
+  .loading-bar {
+    width: 100px; /* adjust the width of the loading bar */
+    height: 100px; /* adjust the height of the loading bar */
+    position: absolute;
+    bottom: 0; /* position the loading bar at the bottom */
+    left: 0; 
+    animation: loading 1.5s linear;
+    background: linear-gradient(to top, orange, green); /* adjust the gradient colors */
+    border: 1px solid black; /* add border properties */
+    transform-origin: bottom; 
+   }
+  
+  @keyframes loading {
+    0% {
+      transform: scaleY(0);
+    }
+    50% {
+      transform: scaleY(0.5);
+      box-shadow: 0 0 20px 4px orange;
+    }
+    100% {
+      transform: scaleY(0.8);
+      box-shadow: 0 0 10px 2px orange;
+    }
+  }
+  .options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+} 
+  .option button {
+    background-color: #3498db;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s, border 0.3s;
+}
+
+.option button:hover {
+    background-color: #2079b0;
+    transform: scale(1.1);
+}
+@keyframes blastAnimationGreen {
+  0% {
+    box-shadow: 0 0 0px 0px green;
+  }
+  50% {
+    box-shadow: 0 0 20px 10px green;
+  }
+  100% {
+    box-shadow: 0 0 0px 0px green;
+  }
+}
+
+@keyframes blastAnimationRed {
+  0% {
+    box-shadow: 0 0 0px 0px red;
+  }
+  50% {
+    box-shadow: 0 0 20px 10px red;
+  }
+  100% {
+    box-shadow: 0 0 0px 0px red;
+  }
+}
+
+
+
+</style>
+
+<script>
+  function submitAnswer(event,id) {
+    event.preventDefault();
+    var optionButtons = document.getElementsByClassName('option-button');
+    for (var i = 0; i < optionButtons.length; i++) {
+      optionButtons[i].disabled = true;
+    }
+    var formData = new FormData();
+    formData.append('answer', document.getElementById("selectedOptionInput").value);
+    formData.append('id',id);
+    //console.log(id);
+    //console.log(document.getElementById("selectedOptionInput").value);
+    var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
+    //console.log(formData);
+    $.ajax({
+      url: 'check_answer/',
+      type: 'POST',
+      data: formData,
+      dataType: 'json',
+      processData: false,
+      contentType: false,
+      headers: {
+        'X-CSRFToken': csrfToken
+      },
+      success: function(data) {
+        // Process the result JSON received from the server
+        console.log(data);
+        // Use the returned data as needed (e.g., display a message to the user)
+        if (data.is_correct) {
+          console.log('Correct answer!');
+          document.getElementById(document.getElementById("selectedOptionInput").value).style.backgroundColor = 'green';
+          var selectedOption = document.getElementById(document.getElementById("selectedOptionInput").value);
+          selectedOption.style.backgroundColor = 'green';
+          selectedOption.style.animation = 'blastAnimationGreen 1s';
+          selectedOption.style.animationIterationCount = '1';
+        } else {
+          console.log('Incorrect answer.');
+          document.getElementById(document.getElementById("selectedOptionInput").value).style.backgroundColor = 'red';
+          var selectedOption = document.getElementById(document.getElementById("selectedOptionInput").value);
+          selectedOption.style.backgroundColor = 'red';
+          selectedOption.style.animation = 'blastAnimationRed 1s';
+          selectedOption.style.animationIterationCount = '1';
+        }
+        setTimeout(function() {
+          window.location.href = '';
+        }, 1000);
+      },
+      error: function(error) {
+        console.log(error);
+      }
+    });
+  }
+  function setSelectedOption(option) {
+    document.getElementById("selectedOptionInput").value=option;
+  }
+  
+  function setMoneyLevel() {
+        meterHeight = ({{visited}} / {{max_questions}}) * {{100}};
+        if (isNaN(meterHeight)){
+          meterHeight=0;
+        } 
+        var gradientColor = calculateGradientColor(meterHeight);
+        //document.getElementsByClassName("money-text").innerHTML =  money;
+        document.addEventListener("DOMContentLoaded", function() {
+          var loadingBar = document.getElementsByClassName("loading-bar")[0];
+          console.log(loadingBar);
+          console.log(meterHeight);
+          loadingBar.style.height = `${meterHeight}%`;
+          loadingBar.style.background = `linear-gradient(to top, ${gradientColor.start}, ${gradientColor.end})`;
+        });
+    }
+    function calculateGradientColor(meterHeight) {
+      var startColor = "orange"; // Starting color of the gradient
+      var endColor = "green"; // Ending color of the gradient
+    
+      // Calculate the color value based on the meter height
+      var percent = (meterHeight / {{ max_questions }}) * 100;
+    
+      // Interpolate the color between startColor and endColor based on the percentage
+      var red = interpolateColor(startColor, endColor, percent, "red");
+      var green = interpolateColor(startColor, endColor, percent, "green");
+      var blue = interpolateColor(startColor, endColor, percent, "blue");
+    
+      // Construct the RGB color value
+      var gradientStartColor = `rgb(${red}, ${green}, ${blue})`;
+    
+      // Return the gradient colors as an object
+      return {
+        start: gradientStartColor,
+        end: endColor,
+      };
+    }
+    
+    function interpolateColor(startColor, endColor, percent, channel) {
+      var start = parseInt(startColor.substring(startColor.indexOf(channel) + 1), 10);
+      var end = parseInt(endColor.substring(endColor.indexOf(channel) + 1), 10);
+    
+      var delta = end - start;
+      var currentValue = start + (delta * percent) / 100;
+    
+      return Math.round(currentValue);
+    }
+    
+  setMoneyLevel(); 
+</script>
+
+<div class="container">
+    <div class="row">
+      <div class="col-md-8">
+        <div class="question">
+            <h2>Question:</h2>
+            <b><p>{{Question.question}}</p></b>
+        </div>
+          <form id="myForm" onsubmit="submitAnswer(event,'{{ Question.id }}')" method="post">
+            <div class="options">
+            {% csrf_token %}
+            {% for option in Question.options %}
+            <div class="option">
+              <button  class="option-button" id="{{ option.strip }}" type="submit"  onclick="setSelectedOption('{{ option.strip }}')">{{ option.strip }}</button>
+            </div>
+            {% endfor %}  
+          </div>
+          <input type="hidden" id="selectedOptionInput" name="selectedOption">
+        </form>
+    </div>
+      <div class="col-md-4">
+   
+            <div class="loading-bar-container" style="margin-top:50px;">
+              <div class="loading-bar-border">
+                <div class="loading-bar"></div>
+                <div class="money-text">${{score}}</div>
+              </div>
+            </div>
+            
+          </div>  
+       
+    </div>
+</div>
+
+{% endblock %}
